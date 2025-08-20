@@ -101,7 +101,7 @@ jobs:
     - name: Test
       run: |
         export LD_LIBRARY_PATH=$PWD/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH
-        dotnet test --configuration Release --no-build --verbosity normal
+        dotnet test tests/LemonNet.Tests/LemonNet.Tests.csproj --configuration Release --no-build --verbosity normal
     
     - name: Calculate version
       id: version
