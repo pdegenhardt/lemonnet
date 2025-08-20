@@ -1,0 +1,156 @@
+name: Build and Publish NuGet
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  NUGET_PACKAGE_NAME: 'LemonNet'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++ make
+    
+    - name: Build native library (Linux)
+      run: |
+        chmod +x build.sh
+        ./build.sh
+    
+    - name: Upload Linux native library
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-native
+        path: src/LemonNet/runtimes/linux-x64/native/lemon_wrapper.so
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Build native library (Windows)
+      run: |
+        cd src\LemonNet.Native
+        msbuild LemonWrapper.Native.vcxproj /p:Configuration=Release /p:Platform=x64
+    
+    - name: Upload Windows native library
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-native
+        path: src/LemonNet/runtimes/win-x64/native/lemon_wrapper.dll
+
+  test-and-publish:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Download Linux native library
+      uses: actions/download-artifact@v4
+      with:
+        name: linux-native
+        path: src/LemonNet/runtimes/linux-x64/native/
+    
+    - name: Download Windows native library
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-native
+        path: src/LemonNet/runtimes/win-x64/native/
+    
+    - name: Set permissions for native library
+      run: chmod +x src/LemonNet/runtimes/linux-x64/native/lemon_wrapper.so
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Test
+      run: |
+        export LD_LIBRARY_PATH=$PWD/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH
+        dotnet test --configuration Release --no-build --verbosity normal
+    
+    - name: Calculate version
+      id: version
+      run: |
+        # Use date-based versioning for automatic incrementing
+        # Format: 0.1.YYMMDD.HHMM
+        VERSION="0.1.$(date -u +'%y%m%d.%H%M')"
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Package version: $VERSION"
+    
+    - name: Pack NuGet package
+      run: |
+        dotnet pack src/LemonNet/LemonNet.csproj \
+          --configuration Release \
+          --no-build \
+          -p:PackageVersion=${{ steps.version.outputs.VERSION }} \
+          --output ./nupkg
+    
+    - name: Upload NuGet package artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: ./nupkg/*.nupkg
+    
+    - name: Publish to NuGet.org
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        dotnet nuget push ./nupkg/*.nupkg \
+          --api-key ${{ secrets.NUGET_API_KEY }} \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
+      continue-on-error: true # Don't fail the build if the package already exists
+    
+    - name: Create GitHub Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.version.outputs.VERSION }}
+        name: Release v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## LemonNet v${{ steps.version.outputs.VERSION }}
+          
+          Automated release from commit ${{ github.sha }}
+          
+          ### Installation
+          ```bash
+          dotnet add package LemonNet --version ${{ steps.version.outputs.VERSION }}
+          ```
+          
+          ### Changes
+          See [commit history](https://github.com/${{ github.repository }}/commits/main) for details.
+        files: ./nupkg/*.nupkg
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -6,13 +6,17 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>LemonNet</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>Your Name</Authors>
-    <Company>Your Company</Company>
-    <Description>C# wrapper for LEMON graph library's Edmonds-Karp max flow algorithm</Description>
-    <PackageTags>graph;maxflow;edmonds-karp;lemon;optimization</PackageTags>
-    <RepositoryUrl>https://github.com/yourusername/lemonnet</RepositoryUrl>
+    <Version>0.1.0</Version>
+    <Authors>Travel Engine</Authors>
+    <Company>Travel Engine</Company>
+    <Description>High-performance C# wrapper for the LEMON graph library, providing Edmonds-Karp and Preflow maximum flow algorithms with native C++ performance. Supports parallel arcs, type-safe API, and cross-platform operation (Windows/Linux x64).</Description>
+    <PackageTags>graph;network-flow;max-flow;edmonds-karp;preflow;push-relabel;lemon;optimization;algorithms;graph-algorithms</PackageTags>
+    <RepositoryUrl>https://github.com/pdegenhardt/lemonnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/pdegenhardt/lemonnet</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
@@ -20,6 +24,9 @@
   <!-- Native files to include in NuGet package -->
   <ItemGroup>
     <Content Include="runtimes\win-x64\native\lemon_wrapper.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Condition="Exists('runtimes\win-x64\native\lemon_wrapper.dll')" />
+    <Content Include="runtimes\linux-x64\native\lemon_wrapper.so" Pack="true" PackagePath="runtimes\linux-x64\native\" Condition="Exists('runtimes\linux-x64\native\lemon_wrapper.so')" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <!-- Automatically copy native DLL to output directory -->
