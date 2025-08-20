@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LemonNetTest": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Dev\\Claude\\lemonnet\\tests\\LemonNet.Tests"
+    }
+  }
+}

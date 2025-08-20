@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>LemonNet</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Your Name</Authors>
+    <Company>Your Company</Company>
+    <Description>C# wrapper for LEMON graph library's Edmonds-Karp max flow algorithm</Description>
+    <PackageTags>graph;maxflow;edmonds-karp;lemon;optimization</PackageTags>
+    <RepositoryUrl>https://github.com/yourusername/lemonnet</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <!-- Native files to include in NuGet package -->
+  <ItemGroup>
+    <Content Include="runtimes\win-x64\native\lemon_wrapper.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Condition="Exists('runtimes\win-x64\native\lemon_wrapper.dll')" />
+  </ItemGroup>
+
+  <!-- Automatically copy native DLL to output directory -->
+  <ItemGroup>
+    <None Include="runtimes\win-x64\native\lemon_wrapper.dll" Condition="Exists('runtimes\win-x64\native\lemon_wrapper.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>lemon_wrapper.dll</Link>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+  <!-- Reference the native project to ensure build order (Windows only) -->
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <ProjectReference Include="..\LemonNet.Native\LemonWrapper.Native.vcxproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  
+  <!-- Linux/Unix: Copy the .so file if it exists -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
+    <None Include="..\..\lemon_wrapper.so" Condition="Exists('..\..\lemon_wrapper.so')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>lemon_wrapper.so</Link>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+</Project>
