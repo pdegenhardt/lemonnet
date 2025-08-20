@@ -89,10 +89,14 @@ jobs:
       run: chmod +x src/LemonNet/runtimes/linux-x64/native/lemon_wrapper.so
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore src/LemonNet/LemonNet.csproj
+        dotnet restore tests/LemonNet.Tests/LemonNet.Tests.csproj
     
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: |
+        dotnet build src/LemonNet/LemonNet.csproj --configuration Release --no-restore
+        dotnet build tests/LemonNet.Tests/LemonNet.Tests.csproj --configuration Release --no-restore
     
     - name: Test
       run: |
