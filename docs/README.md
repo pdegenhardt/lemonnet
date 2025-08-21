@@ -17,11 +17,11 @@ LemonNet provides a clean, idiomatic C# API for LEMON's graph algorithms. The ar
 
 ### Implemented
 - ✅ `LemonDigraph` - Directed graph data structure
-- ✅ `ArcMap` - Arc property storage (currently supports `double` values)
+- ✅ `ArcMap` - Arc property storage (supports `long` integer values)
 - ✅ `EdmondsKarp` - Maximum flow algorithm
+- ✅ `Preflow` - Push-relabel maximum flow algorithm
 
 ### Planned
-- 🔲 `Preflow` - Push-relabel maximum flow algorithm
 - 🔲 `NetworkSimplex` - Minimum cost flow algorithm  
 - 🔲 `CostScaling` - Cost scaling minimum cost flow algorithm
 - 🔲 `CapacityScaling` - Capacity scaling algorithm
@@ -88,7 +88,7 @@ dotnet build tests/LemonNet.Tests/LemonNet.Tests.csproj
 
 ## Testing
 
-The project includes a comprehensive XUnit test suite with 56+ tests covering all components:
+The project includes a comprehensive XUnit test suite with 68 tests covering all components. All tests pass on Windows x64.
 
 ```bash
 # Run all tests
@@ -99,10 +99,11 @@ dotnet test tests/LemonNet.Tests/LemonNet.Tests.csproj --logger "console;verbosi
 ```
 
 Test coverage includes:
-- Graph operations (node/arc management)
-- Algorithm correctness (Edmonds-Karp)
-- Arc property maps
-- Parallel arc support
+- Graph operations (node/arc management) - 15 tests
+- Algorithm correctness (Edmonds-Karp) - 13 tests  
+- Algorithm correctness (Preflow) - 15 tests
+- Arc property maps - 12 tests
+- Parallel arc support - 13 tests
 - Error handling and edge cases
 - Performance benchmarks
 

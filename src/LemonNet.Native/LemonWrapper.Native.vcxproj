@@ -50,8 +50,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <TargetName>lemon_wrapper</TargetName>
-    <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   
   

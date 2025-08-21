@@ -10,9 +10,9 @@ public readonly struct EdgeFlow : IEquatable<EdgeFlow>
 {
     public Node Source { get; }
     public Node Target { get; }
-    public double Flow { get; }
+    public long Flow { get; }
 
-    public EdgeFlow(Node source, Node target, double flow)
+    public EdgeFlow(Node source, Node target, long flow)
     {
         Source = source;
         Target = target;

@@ -26,7 +26,7 @@ public class EdmondsKarpTests
         var result = edmonds.Run(data.Source, data.Target);
 
         // Assert
-        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue, 6);
+        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue);
         output.WriteLine($"{data.Description}: Max flow = {result.MaxFlowValue}");
         output.WriteLine($"Edges with flow: {result.EdgeFlows.Count}");
     }
@@ -42,7 +42,7 @@ public class EdmondsKarpTests
         var result = edmonds.Run(data.Source, data.Target);
 
         // Assert
-        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue, 6);
+        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue);
         output.WriteLine($"{data.Description}: Max flow = {result.MaxFlowValue}");
     }
 
@@ -57,7 +57,7 @@ public class EdmondsKarpTests
         var result = edmonds.Run(data.Source, data.Target);
 
         // Assert
-        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue, 6);
+        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue);
         output.WriteLine($"{data.Description}: Max flow = {result.MaxFlowValue}");
     }
 
@@ -72,7 +72,7 @@ public class EdmondsKarpTests
         var result = edmonds.Run(data.Source, data.Target);
 
         // Assert
-        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue, 6);
+        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue);
         Assert.Empty(result.EdgeFlows);
         output.WriteLine($"{data.Description}: Max flow = {result.MaxFlowValue}");
     }
@@ -88,7 +88,7 @@ public class EdmondsKarpTests
         var result = edmonds.Run(data.Source, data.Target);
 
         // Assert
-        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue, 6);
+        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue);
         Assert.Single(result.EdgeFlows);
         output.WriteLine($"{data.Description}: Max flow = {result.MaxFlowValue}");
     }
@@ -104,7 +104,7 @@ public class EdmondsKarpTests
         var result = edmonds.Run(data.Source, data.Target);
 
         // Assert
-        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue, 6);
+        Assert.Equal(data.ExpectedMaxFlow, result.MaxFlowValue);
         output.WriteLine($"{data.Description}: Max flow = {result.MaxFlowValue}");
     }
 
@@ -181,10 +181,19 @@ public class EdmondsKarpTests
 
         // Act
         var result = edmonds.Run(data.Source, data.Target);
+        
+        // Debug output
+        output.WriteLine($"EdmondsKarp max flow value: {result.MaxFlowValue}");
+        output.WriteLine($"Expected max flow: {data.ExpectedMaxFlow}");
+        output.WriteLine($"Total edge flows: {result.EdgeFlows.Count}");
+        foreach (var flow in result.EdgeFlows)
+        {
+            output.WriteLine($"  Edge {flow.Source} -> {flow.Target}: flow = {flow.Flow}");
+        }
 
         // Assert - Verify flow conservation at all nodes
-        var flowIn = new Dictionary<Node, double>();
-        var flowOut = new Dictionary<Node, double>();
+        var flowIn = new Dictionary<Node, long>();
+        var flowOut = new Dictionary<Node, long>();
 
         // Initialize flow dictionaries for all nodes
         // We need to track all nodes that appear in the flow results
@@ -215,13 +224,13 @@ public class EdmondsKarpTests
             {
                 // Source: flow out should equal max flow
                 output.WriteLine($"Source: Flow out = {flowOut.GetValueOrDefault(node):F2}");
-                Assert.Equal(result.MaxFlowValue, flowOut.GetValueOrDefault(node), 6);
+                Assert.Equal(result.MaxFlowValue, flowOut.GetValueOrDefault(node));
             }
             else if (node.Equals(data.Target))
             {
                 // Target: flow in should equal max flow
                 output.WriteLine($"Target: Flow in = {flowIn.GetValueOrDefault(node):F2}");
-                Assert.Equal(result.MaxFlowValue, flowIn.GetValueOrDefault(node), 6);
+                Assert.Equal(result.MaxFlowValue, flowIn.GetValueOrDefault(node));
             }
             else
             {
@@ -229,7 +238,7 @@ public class EdmondsKarpTests
                 var inFlow = flowIn.GetValueOrDefault(node);
                 var outFlow = flowOut.GetValueOrDefault(node);
                 output.WriteLine($"Intermediate node: Flow in = {inFlow:F2}, Flow out = {outFlow:F2}");
-                Assert.Equal(inFlow, outFlow, 6);
+                Assert.Equal(inFlow, outFlow);
             }
         }
 

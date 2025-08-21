@@ -57,8 +57,12 @@ jobs:
     
     - name: Build native library (Windows)
       run: |
-        cd src\LemonNet.Native
-        msbuild LemonWrapper.Native.vcxproj /p:Configuration=Release /p:Platform=x64
+        msbuild src\LemonNet.Native\LemonWrapper.Native.vcxproj /p:Configuration=Release /p:Platform=x64
+    
+    - name: Copy Windows native library to runtime directory
+      run: |
+        mkdir -p src\LemonNet\runtimes\win-x64\native
+        copy src\LemonNet.Native\bin\x64\Release\lemon_wrapper.dll src\LemonNet\runtimes\win-x64\native\
     
     - name: Upload Windows native library
       uses: actions/upload-artifact@v4

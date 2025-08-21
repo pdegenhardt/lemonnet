@@ -5,7 +5,7 @@ namespace LemonNet;
 
 /// <summary>
 /// Represents a map that associates values with arcs in a LEMON digraph.
-/// Currently supports double values only.
+/// Currently supports long values only.
 /// </summary>
 public class ArcMap : IDisposable
 {
@@ -16,16 +16,16 @@ public class ArcMap : IDisposable
     #region P/Invoke declarations
 
     [DllImport("lemon_wrapper", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr lemon_create_arc_map_double(IntPtr graph);
+    private static extern IntPtr lemon_create_arc_map_long(IntPtr graph);
 
     [DllImport("lemon_wrapper", CallingConvention = CallingConvention.Cdecl)]
     private static extern void lemon_destroy_arc_map(IntPtr map);
 
     [DllImport("lemon_wrapper", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void lemon_set_arc_value_double(IntPtr map, int arc, double value);
+    private static extern void lemon_set_arc_value_long(IntPtr map, int arc, long value);
 
     [DllImport("lemon_wrapper", CallingConvention = CallingConvention.Cdecl)]
-    private static extern double lemon_get_arc_value_double(IntPtr map, int arc);
+    private static extern long lemon_get_arc_value_long(IntPtr map, int arc);
 
     #endregion
 
@@ -41,7 +41,7 @@ public class ArcMap : IDisposable
         }
 
         parentGraph = graph;
-        mapHandle = lemon_create_arc_map_double(graph.Handle);
+        mapHandle = lemon_create_arc_map_long(graph.Handle);
         
         if (mapHandle == IntPtr.Zero)
         {
@@ -79,7 +79,7 @@ public class ArcMap : IDisposable
     /// </summary>
     /// <param name="arc">The arc to set the value for.</param>
     /// <param name="value">The value to associate with the arc.</param>
-    public void SetValue(Arc arc, double value)
+    public void SetValue(Arc arc, long value)
     {
         ThrowIfDisposed();
 
@@ -88,7 +88,7 @@ public class ArcMap : IDisposable
             throw new ArgumentException("Invalid arc for this graph", nameof(arc));
         }
 
-        lemon_set_arc_value_double(mapHandle, arc.Id, value);
+        lemon_set_arc_value_long(mapHandle, arc.Id, value);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public class ArcMap : IDisposable
     /// </summary>
     /// <param name="arc">The arc to get the value for.</param>
     /// <returns>The value associated with the arc.</returns>
-    public double GetValue(Arc arc)
+    public long GetValue(Arc arc)
     {
         ThrowIfDisposed();
 
@@ -105,7 +105,7 @@ public class ArcMap : IDisposable
             throw new ArgumentException("Invalid arc for this graph", nameof(arc));
         }
 
-        return lemon_get_arc_value_double(mapHandle, arc.Id);
+        return lemon_get_arc_value_long(mapHandle, arc.Id);
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public class ArcMap : IDisposable
     /// </summary>
     /// <param name="arc">The arc to access.</param>
     /// <returns>The value associated with the arc.</returns>
-    public double this[Arc arc]
+    public long this[Arc arc]
     {
         get => GetValue(arc);
         set => SetValue(arc, value);

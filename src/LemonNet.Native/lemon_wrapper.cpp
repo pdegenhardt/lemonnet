@@ -16,12 +16,14 @@ namespace lemon {
     float Tolerance<float>::def_epsilon = static_cast<float>(1e-4);
     double Tolerance<double>::def_epsilon = 1e-10;
     long double Tolerance<long double>::def_epsilon = 1e-14;
+    // Note: long uses the base Tolerance template which provides exact comparisons
+    // No def_epsilon member needed for integer types
     
     // Define INVALID constant
     const Invalid INVALID = Invalid();
 }
 
-struct GraphWrapper {
+struct GraphWrapper { 
     SmartDigraph graph;
     std::vector<SmartDigraph::Node> nodes;
     std::vector<SmartDigraph::Arc> arcs;
@@ -34,11 +36,11 @@ struct GraphWrapper {
 };
 
 struct ArcMapWrapper {
-    SmartDigraph::ArcMap<double>* map;
+    SmartDigraph::ArcMap<long>* map;
     GraphWrapper* graph_wrapper;
     
     ArcMapWrapper(GraphWrapper* gw) : graph_wrapper(gw) {
-        map = new SmartDigraph::ArcMap<double>(gw->graph);
+        map = new SmartDigraph::ArcMap<long>(gw->graph);
     }
     
     ~ArcMapWrapper() {
@@ -144,7 +146,7 @@ LEMON_API int lemon_arc_count(LemonGraph graph) {
 }
 
 // Arc map operations
-LEMON_API LemonArcMap lemon_create_arc_map_double(LemonGraph graph) {
+LEMON_API LemonArcMap lemon_create_arc_map_long(LemonGraph graph) {
     if (!graph) return nullptr;
     
     GraphWrapper* wrapper = static_cast<GraphWrapper*>(graph);
@@ -157,7 +159,7 @@ LEMON_API void lemon_destroy_arc_map(LemonArcMap map) {
     }
 }
 
-LEMON_API void lemon_set_arc_value_double(LemonArcMap map, int arc, double value) {
+LEMON_API void lemon_set_arc_value_long(LemonArcMap map, int arc, long long value) {
     if (!map) return;
     
     ArcMapWrapper* wrapper = static_cast<ArcMapWrapper*>(map);
@@ -169,22 +171,22 @@ LEMON_API void lemon_set_arc_value_double(LemonArcMap map, int arc, double value
     (*(wrapper->map))[wrapper->graph_wrapper->arcs[arc]] = value;
 }
 
-LEMON_API double lemon_get_arc_value_double(LemonArcMap map, int arc) {
-    if (!map) return 0.0;
+LEMON_API long long lemon_get_arc_value_long(LemonArcMap map, int arc) {
+    if (!map) return 0;
     
     ArcMapWrapper* wrapper = static_cast<ArcMapWrapper*>(map);
     
     if (arc < 0 || arc >= static_cast<int>(wrapper->graph_wrapper->arcs.size())) {
-        return 0.0;
+        return 0;
     }
     
     return (*(wrapper->map))[wrapper->graph_wrapper->arcs[arc]];
 }
 
-LEMON_API double lemon_edmonds_karp(LemonGraph graph, LemonArcMap capacity_map,
-                                     int source, int target, 
-                                     FlowResult** flow_results, int* flow_count) {
-    if (!graph || !capacity_map || !flow_results || !flow_count) return -1.0;
+LEMON_API long long lemon_edmonds_karp(LemonGraph graph, LemonArcMap capacity_map,
+                                   int source, int target, 
+                                   FlowResult** flow_results, int* flow_count) {
+    if (!graph || !capacity_map || !flow_results || !flow_count) return -1;
     
     GraphWrapper* graph_wrapper = static_cast<GraphWrapper*>(graph);
     ArcMapWrapper* capacity_wrapper = static_cast<ArcMapWrapper*>(capacity_map);
@@ -193,16 +195,18 @@ LEMON_API double lemon_edmonds_karp(LemonGraph graph, LemonArcMap capacity_map,
         target < 0 || target >= static_cast<int>(graph_wrapper->nodes.size())) {
         *flow_results = nullptr;
         *flow_count = 0;
-        return -1.0;
+        return -1;
     }
     
-    typedef EdmondsKarp<SmartDigraph, SmartDigraph::ArcMap<double>> EK;
+    typedef EdmondsKarp<SmartDigraph, SmartDigraph::ArcMap<long>> EK;
+    SmartDigraph::ArcMap<long> flow_map(graph_wrapper->graph);
     EK ek(graph_wrapper->graph, *(capacity_wrapper->map), 
           graph_wrapper->nodes[source], graph_wrapper->nodes[target]);
+    ek.flowMap(flow_map);
     
     ek.run();
     
-    double max_flow = ek.flowValue();
+    long long max_flow = ek.flowValue();
     
     std::vector<FlowResult> results;
     std::map<SmartDigraph::Node, int> node_to_index;
@@ -211,67 +215,7 @@ LEMON_API double lemon_edmonds_karp(LemonGraph graph, LemonArcMap capacity_map,
     }
     
     for (const auto& arc : graph_wrapper->arcs) {
-        double flow = ek.flow(arc);
-        if (flow > 0) {
-            FlowResult result;
-            result.source = node_to_index[graph_wrapper->graph.source(arc)];
-            result.target = node_to_index[graph_wrapper->graph.target(arc)];
-            result.flow = flow;
-            results.push_back(result);
-        }
-    }
-    
-    *flow_count = static_cast<int>(results.size());
-    if (*flow_count > 0) {
-        *flow_results = static_cast<FlowResult*>(malloc(sizeof(FlowResult) * (*flow_count)));
-        for (int i = 0; i < *flow_count; ++i) {
-            (*flow_results)[i] = results[i];
-        }
-    } else {
-        *flow_results = nullptr;
-    }
-    
-    return max_flow;
-}
-
-LEMON_API void lemon_free_results(FlowResult* results) {
-    if (results) {
-        free(results);
-    }
-}
-
-// Preflow algorithm implementation
-LEMON_API double lemon_preflow(LemonGraph graph, LemonArcMap capacity_map,
-                                int source, int target,
-                                FlowResult** flow_results, int* flow_count) {
-    if (!graph || !capacity_map || !flow_results || !flow_count) return -1.0;
-    
-    GraphWrapper* graph_wrapper = static_cast<GraphWrapper*>(graph);
-    ArcMapWrapper* capacity_wrapper = static_cast<ArcMapWrapper*>(capacity_map);
-    
-    if (source < 0 || source >= static_cast<int>(graph_wrapper->nodes.size()) ||
-        target < 0 || target >= static_cast<int>(graph_wrapper->nodes.size())) {
-        *flow_results = nullptr;
-        *flow_count = 0;
-        return -1.0;
-    }
-    
-    typedef Preflow<SmartDigraph, SmartDigraph::ArcMap<double>> PF;
-    PF pf(graph_wrapper->graph, *(capacity_wrapper->map),
-          graph_wrapper->nodes[source], graph_wrapper->nodes[target]);
-    
-    pf.run();
-    
-    double max_flow = pf.flowValue();
-    
-    std::vector<FlowResult> results;
-    std::map<SmartDigraph::Node, int> node_to_index;
-    for (size_t i = 0; i < graph_wrapper->nodes.size(); ++i) {
-        node_to_index[graph_wrapper->nodes[i]] = static_cast<int>(i);
-    }
-    
-    for (const auto& arc : graph_wrapper->arcs) {
-        double flow = pf.flow(arc);
+        long long flow = flow_map[arc];
         if (flow > 0) {
             SmartDigraph::Node src = graph_wrapper->graph.source(arc);
             SmartDigraph::Node tgt = graph_wrapper->graph.target(arc);
@@ -294,7 +238,76 @@ LEMON_API double lemon_preflow(LemonGraph graph, LemonArcMap capacity_map,
             memcpy(*flow_results, results.data(), sizeof(FlowResult) * results.size());
         } else {
             *flow_count = 0;
-            return -1.0;
+            return -1;
+        }
+    }
+    
+    return max_flow;
+}
+
+LEMON_API void lemon_free_results(FlowResult* results) {
+    if (results) {
+        free(results);
+    }
+}
+
+// Preflow algorithm implementation
+LEMON_API long long lemon_preflow(LemonGraph graph, LemonArcMap capacity_map,
+                              int source, int target,
+                              FlowResult** flow_results, int* flow_count) {
+    if (!graph || !capacity_map || !flow_results || !flow_count) return -1;
+    
+    GraphWrapper* graph_wrapper = static_cast<GraphWrapper*>(graph);
+    ArcMapWrapper* capacity_wrapper = static_cast<ArcMapWrapper*>(capacity_map);
+    
+    if (source < 0 || source >= static_cast<int>(graph_wrapper->nodes.size()) ||
+        target < 0 || target >= static_cast<int>(graph_wrapper->nodes.size())) {
+        *flow_results = nullptr;
+        *flow_count = 0;
+        return -1;
+    }
+    
+    typedef Preflow<SmartDigraph, SmartDigraph::ArcMap<long>> PF;
+    SmartDigraph::ArcMap<long> flow_map(graph_wrapper->graph);
+    PF pf(graph_wrapper->graph, *(capacity_wrapper->map),
+          graph_wrapper->nodes[source], graph_wrapper->nodes[target]);
+    pf.flowMap(flow_map);
+    
+    pf.run();
+    
+    long long max_flow = pf.flowValue();
+    
+    std::vector<FlowResult> results;
+    std::map<SmartDigraph::Node, int> node_to_index;
+    for (size_t i = 0; i < graph_wrapper->nodes.size(); ++i) {
+        node_to_index[graph_wrapper->nodes[i]] = static_cast<int>(i);
+    }
+    
+    for (const auto& arc : graph_wrapper->arcs) {
+        long long flow = flow_map[arc];
+        if (flow > 0) {
+            SmartDigraph::Node src = graph_wrapper->graph.source(arc);
+            SmartDigraph::Node tgt = graph_wrapper->graph.target(arc);
+            
+            FlowResult result;
+            result.source = node_to_index[src];
+            result.target = node_to_index[tgt];
+            result.flow = flow;
+            results.push_back(result);
+        }
+    }
+    
+    if (results.empty()) {
+        *flow_count = 0;
+        *flow_results = nullptr;
+    } else {
+        *flow_count = static_cast<int>(results.size());
+        *flow_results = static_cast<FlowResult*>(malloc(sizeof(FlowResult) * results.size()));
+        if (*flow_results) {
+            memcpy(*flow_results, results.data(), sizeof(FlowResult) * results.size());
+        } else {
+            *flow_count = 0;
+            return -1;
         }
     }
     

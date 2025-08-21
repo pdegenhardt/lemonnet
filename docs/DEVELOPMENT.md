@@ -58,8 +58,8 @@ lemonnet/
 - `Arc` - Lightweight struct with just an ID
 
 #### Properties
-- `ArcMap` - Wraps `SmartDigraph::ArcMap<double>`
-- Stores values associated with arcs
+- `ArcMap` - Wraps `SmartDigraph::ArcMap<long>`
+- Stores integer values associated with arcs (capacities, costs)
 
 #### Algorithms
 - `EdmondsKarp` - Wraps LEMON's Edmonds-Karp implementation
@@ -84,6 +84,11 @@ lemonnet/
    # Or from command line:
    msbuild LemonNet.sln /p:Configuration=Release /p:Platform=x64
    ```
+
+3. **Build Output**
+   - Native DLL: `src/LemonNet.Native/bin/x64/[Debug|Release]/lemon_wrapper.dll`
+   - Runtime copy: `src/LemonNet/runtimes/win-x64/native/lemon_wrapper.dll`
+   - The LemonNet.csproj automatically copies the native DLL after build
 
 ### Linux/macOS
 
@@ -335,11 +340,74 @@ private static extern ReturnType lemon_function_name(params);
 - Memory pooling for result objects
 - Parallel algorithm variants
 
+## Platform-Specific Considerations
+
+### Windows x64 Type Mappings
+On Windows x64, special care must be taken with C++ to C# type mappings:
+
+| C++ Type | Windows Size | C# Type | C# Size | Solution |
+|----------|--------------|---------|---------|----------|
+| `long` | 32-bit | `long` | 64-bit | Use `long long` in C++ |
+| `int` | 32-bit | `int` | 32-bit | Direct mapping |
+| `double` | 64-bit | `double` | 64-bit | Direct mapping |
+
+The native wrapper uses `long long` (64-bit) for all flow values to ensure compatibility with C# `long` type. This prevents memory corruption when marshaling FlowResult structures.
+
+### Memory Layout
+The FlowResult structure must maintain identical layout between C++ and C#:
+
+```c++
+// C++ (lemon_wrapper.h)
+typedef struct {
+    int source;      // 4 bytes
+    int target;      // 4 bytes  
+    long long flow;  // 8 bytes (must be long long on Windows!)
+} FlowResult;      // Total: 16 bytes
+```
+
+```csharp
+// C# (MarshalHelper.cs)
+[StructLayout(LayoutKind.Sequential)]
+internal struct NativeFlowResult
+{
+    public int source;   // 4 bytes
+    public int target;   // 4 bytes
+    public long flow;    // 8 bytes
+}                       // Total: 16 bytes
+```
+
+## Troubleshooting
+
+### Common Build Issues
+
+1. **Native project fails to build with dotnet CLI**
+   - Error: `The imported file "$(VCTargetsPath)\Microsoft.Cpp.Default.props" does not exist`
+   - Solution: Use Visual Studio or MSBuild from VS Developer Command Prompt, not `dotnet build`
+
+2. **Memory corruption in test results**
+   - Symptom: Invalid node IDs or huge negative flow values
+   - Cause: Type size mismatch between C++ `long` (32-bit) and C# `long` (64-bit) on Windows
+   - Solution: Ensure native code uses `long long` for all flow values
+
+3. **DllNotFoundException at runtime**
+   - Check that `lemon_wrapper.dll` exists in the output directory
+   - Verify the DLL is x64 (not x86) using tools like `dumpbin /headers`
+   - Ensure Visual C++ redistributables are installed
+
+### Algorithm-Specific Issues
+
+1. **EdmondsKarp flow access**
+   - EdmondsKarp requires explicit flow map: `ek.flowMap(flow_map)`
+   - Access flows via `flow_map[arc]`, not `ek.flow(arc)`
+
+2. **Preflow algorithm setup**
+   - Must provide flow map before calling `run()`
+   - Same pattern as EdmondsKarp for consistency
+
 ## Known Issues
 
 1. **Platform-specific builds** - Need separate native libraries for each platform
-2. **Limited type support** - ArcMap only supports double currently
-3. **No generic support** - Would benefit from `ArcMap<T>`
+2. **No generic support** - Would benefit from `ArcMap<T>` for different value types
 
 ## Contributing
 

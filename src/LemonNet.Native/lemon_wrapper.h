@@ -21,7 +21,7 @@ typedef void* LemonArcMap;
 typedef struct {
     int source;
     int target;
-    double flow;
+    long long flow;  // Use long long (64-bit) to match C# long
 } FlowResult;
 
 // Graph operations
@@ -35,20 +35,20 @@ LEMON_API int lemon_node_count(LemonGraph graph);
 LEMON_API int lemon_arc_count(LemonGraph graph);
 
 // Arc map operations
-LEMON_API LemonArcMap lemon_create_arc_map_double(LemonGraph graph);
+LEMON_API LemonArcMap lemon_create_arc_map_long(LemonGraph graph);
 LEMON_API void lemon_destroy_arc_map(LemonArcMap map);
-LEMON_API void lemon_set_arc_value_double(LemonArcMap map, int arc, double value);
-LEMON_API double lemon_get_arc_value_double(LemonArcMap map, int arc);
+LEMON_API void lemon_set_arc_value_long(LemonArcMap map, int arc, long long value);
+LEMON_API long long lemon_get_arc_value_long(LemonArcMap map, int arc);
 
 // Edmonds-Karp algorithm
-LEMON_API double lemon_edmonds_karp(LemonGraph graph, LemonArcMap capacity_map, 
-                                     int source, int target, 
-                                     FlowResult** flow_results, int* flow_count);
+LEMON_API long long lemon_edmonds_karp(LemonGraph graph, LemonArcMap capacity_map, 
+                                   int source, int target, 
+                                   FlowResult** flow_results, int* flow_count);
 
 // Preflow algorithm
-LEMON_API double lemon_preflow(LemonGraph graph, LemonArcMap capacity_map,
-                                int source, int target,
-                                FlowResult** flow_results, int* flow_count);
+LEMON_API long long lemon_preflow(LemonGraph graph, LemonArcMap capacity_map,
+                              int source, int target,
+                              FlowResult** flow_results, int* flow_count);
 
 LEMON_API void lemon_free_results(FlowResult* results);
 

@@ -48,7 +48,7 @@ public class ArcMapTests : IDisposable
         var source = graph.AddNode();
         var target = graph.AddNode();
         var arc = graph.AddArc(source, target);
-        const double value = 42.5;
+        const long value = 42;
 
         // Act
         arcMap.SetValue(arc, value);
@@ -69,7 +69,7 @@ public class ArcMapTests : IDisposable
         var value = arcMap.GetValue(arc);
 
         // Assert
-        Assert.Equal(0.0, value);
+        Assert.Equal(0, value);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ArcMapTests : IDisposable
         var source = graph.AddNode();
         var target = graph.AddNode();
         var arc = graph.AddArc(source, target);
-        const double value = 33.3;
+        const long value = 33;
 
         // Act
         arcMap[arc] = value;
@@ -95,7 +95,7 @@ public class ArcMapTests : IDisposable
         var source = graph.AddNode();
         var target = graph.AddNode();
         var arc = graph.AddArc(source, target);
-        const double value = 55.5;
+        const long value = 55;
         arcMap.SetValue(arc, value);
 
         // Act
@@ -112,7 +112,7 @@ public class ArcMapTests : IDisposable
         var invalidArc = Arc.Invalid;
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => arcMap.SetValue(invalidArc, 10.0));
+        Assert.Throws<ArgumentException>(() => arcMap.SetValue(invalidArc, 10));
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public class ArcMapTests : IDisposable
         var arcFromOtherGraph = otherGraph.AddArc(n1, n2);
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => arcMap.SetValue(arcFromOtherGraph, 10.0));
+        Assert.Throws<ArgumentException>(() => arcMap.SetValue(arcFromOtherGraph, 10));
     }
 
     [Fact]
@@ -149,14 +149,14 @@ public class ArcMapTests : IDisposable
         var arc3 = graph.AddArc(source, target);
 
         // Act
-        arcMap[arc1] = 10.0;
-        arcMap[arc2] = 20.0;
-        arcMap[arc3] = 30.0;
+        arcMap[arc1] = 10;
+        arcMap[arc2] = 20;
+        arcMap[arc3] = 30;
 
         // Assert
-        Assert.Equal(10.0, arcMap[arc1]);
-        Assert.Equal(20.0, arcMap[arc2]);
-        Assert.Equal(30.0, arcMap[arc3]);
+        Assert.Equal(10, arcMap[arc1]);
+        Assert.Equal(20, arcMap[arc2]);
+        Assert.Equal(30, arcMap[arc3]);
         
         output.WriteLine("Multiple arcs between same nodes have independent values:");
         output.WriteLine($"Arc1: {arcMap[arc1]}");
@@ -173,12 +173,12 @@ public class ArcMapTests : IDisposable
         var arc = graph.AddArc(source, target);
 
         // Act
-        arcMap[arc] = 10.0;
-        arcMap[arc] = 20.0;
-        arcMap[arc] = 30.0;
+        arcMap[arc] = 10;
+        arcMap[arc] = 20;
+        arcMap[arc] = 30;
 
         // Assert
-        Assert.Equal(30.0, arcMap[arc]);
+        Assert.Equal(30, arcMap[arc]);
     }
 
     [Fact]
@@ -205,9 +205,9 @@ public class ArcMapTests : IDisposable
         tempMap.Dispose();
 
         // Act & Assert
-        Assert.Throws<ObjectDisposedException>(() => tempMap.SetValue(arc, 10.0));
+        Assert.Throws<ObjectDisposedException>(() => tempMap.SetValue(arc, 10));
         Assert.Throws<ObjectDisposedException>(() => tempMap.GetValue(arc));
-        Assert.Throws<ObjectDisposedException>(() => tempMap[arc] = 10.0);
+        Assert.Throws<ObjectDisposedException>(() => tempMap[arc] = 10);
         Assert.Throws<ObjectDisposedException>(() => _ = tempMap[arc]);
         Assert.Throws<ObjectDisposedException>(() => _ = tempMap.ParentGraph);
     }

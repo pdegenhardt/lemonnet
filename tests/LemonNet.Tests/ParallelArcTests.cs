@@ -62,14 +62,14 @@ public class ParallelArcTests : IDisposable
         var arc2 = graph.AddArc(source, target);
         var arc3 = graph.AddArc(source, target);
 
-        capacityMap[arc1] = 10.0;
-        capacityMap[arc2] = 20.0;
-        capacityMap[arc3] = 30.0;
+        capacityMap[arc1] = 10;
+        capacityMap[arc2] = 20;
+        capacityMap[arc3] = 30;
 
         // Assert
-        Assert.Equal(10.0, capacityMap[arc1]);
-        Assert.Equal(20.0, capacityMap[arc2]);
-        Assert.Equal(30.0, capacityMap[arc3]);
+        Assert.Equal(10, capacityMap[arc1]);
+        Assert.Equal(20, capacityMap[arc2]);
+        Assert.Equal(30, capacityMap[arc3]);
     }
 
     [Fact]
@@ -80,21 +80,41 @@ public class ParallelArcTests : IDisposable
         var sink = graph.AddNode();
 
         // Create 3 parallel arcs with different capacities
-        capacityMap[graph.AddArc(source, sink)] = 10.0;
-        capacityMap[graph.AddArc(source, sink)] = 5.0;
-        capacityMap[graph.AddArc(source, sink)] = 15.0;
+        capacityMap[graph.AddArc(source, sink)] = 10;
+        capacityMap[graph.AddArc(source, sink)] = 5;
+        capacityMap[graph.AddArc(source, sink)] = 15;
 
         var edmonds = new EdmondsKarp(graph, capacityMap);
 
         // Act
         var result = edmonds.Run(source, sink);
+        
+        // Debug output
+        output.WriteLine($"EdmondsKarp max flow value: {result.MaxFlowValue}");
+        output.WriteLine($"Expected max flow: 30");
+        output.WriteLine($"Total edge flows: {result.EdgeFlows.Count}");
+        foreach (var flow in result.EdgeFlows)
+        {
+            output.WriteLine($"  Edge {flow.Source} -> {flow.Target}: flow = {flow.Flow}");
+        }
 
         // Assert
-        Assert.Equal(30.0, result.MaxFlowValue);  // Sum of all capacities
+        Assert.Equal(30, result.MaxFlowValue);  // Sum of all capacities
         Assert.Equal(3, result.EdgeFlows.Count);   // All 3 arcs should have flow
         
         var totalFlow = result.EdgeFlows.Sum(e => e.Flow);
-        Assert.Equal(30.0, totalFlow);
+        output.WriteLine($"Total flow sum: {totalFlow}");
+        
+        // Debug: Check for overflow or corrupted values
+        foreach (var flow in result.EdgeFlows)
+        {
+            if (flow.Flow < 0 || flow.Flow > 1000000)
+            {
+                output.WriteLine($"WARNING: Suspicious flow value {flow.Flow} on edge {flow.Source} -> {flow.Target}");
+            }
+        }
+        
+        Assert.Equal(30L, totalFlow);
         
         output.WriteLine($"Total max flow through parallel arcs: {result.MaxFlowValue}");
         foreach (var flow in result.EdgeFlows)
@@ -112,13 +132,13 @@ public class ParallelArcTests : IDisposable
         var sink = graph.AddNode();
 
         // Two parallel arcs from source to middle
-        capacityMap[graph.AddArc(source, middle)] = 10.0;
-        capacityMap[graph.AddArc(source, middle)] = 15.0;
+        capacityMap[graph.AddArc(source, middle)] = 10;
+        capacityMap[graph.AddArc(source, middle)] = 15;
 
         // Three parallel arcs from middle to sink
-        capacityMap[graph.AddArc(middle, sink)] = 8.0;
-        capacityMap[graph.AddArc(middle, sink)] = 7.0;
-        capacityMap[graph.AddArc(middle, sink)] = 5.0;
+        capacityMap[graph.AddArc(middle, sink)] = 8;
+        capacityMap[graph.AddArc(middle, sink)] = 7;
+        capacityMap[graph.AddArc(middle, sink)] = 5;
 
         var edmonds = new EdmondsKarp(graph, capacityMap);
 
@@ -127,7 +147,7 @@ public class ParallelArcTests : IDisposable
 
         // Assert
         // Max flow limited by smaller total capacity (middle->sink = 20)
-        Assert.Equal(20.0, result.MaxFlowValue);
+        Assert.Equal(20, result.MaxFlowValue);
         
         output.WriteLine($"Max flow in mixed parallel network: {result.MaxFlowValue}");
         output.WriteLine($"Source->Middle capacity: 25, Middle->Sink capacity: 20");
@@ -141,9 +161,9 @@ public class ParallelArcTests : IDisposable
         var source = graph.AddNode();
         var sink = graph.AddNode();
 
-        capacityMap[graph.AddArc(source, sink)] = 10.0;
-        capacityMap[graph.AddArc(source, sink)] = 0.0;   // Zero capacity
-        capacityMap[graph.AddArc(source, sink)] = 5.0;
+        capacityMap[graph.AddArc(source, sink)] = 10;
+        capacityMap[graph.AddArc(source, sink)] = 0;   // Zero capacity
+        capacityMap[graph.AddArc(source, sink)] = 5;
 
         var edmonds = new EdmondsKarp(graph, capacityMap);
 
@@ -151,7 +171,7 @@ public class ParallelArcTests : IDisposable
         var result = edmonds.Run(source, sink);
 
         // Assert
-        Assert.Equal(15.0, result.MaxFlowValue);  // 10 + 0 + 5
+        Assert.Equal(15, result.MaxFlowValue);  // 10 + 0 + 5
         
         // The arc with zero capacity might not appear in results
         var nonZeroFlows = result.EdgeFlows.Where(e => e.Flow > 0).Count();
@@ -199,7 +219,7 @@ public class ParallelArcTests : IDisposable
         
         for (int i = 0; i < parallelArcCount; i++)
         {
-            capacityMap[graph.AddArc(source, sink)] = i + 1.0;
+            capacityMap[graph.AddArc(source, sink)] = i + 1;
         }
 
         var edmonds = new EdmondsKarp(graph, capacityMap);
@@ -211,7 +231,7 @@ public class ParallelArcTests : IDisposable
 
         // Assert
         // Sum of 1+2+3+...+100 = 100*101/2 = 5050
-        Assert.Equal(5050.0, result.MaxFlowValue);
+        Assert.Equal(5050, result.MaxFlowValue);
         Assert.Equal(parallelArcCount, result.EdgeFlows.Count);
         
         output.WriteLine($"Processed {parallelArcCount} parallel arcs in {elapsedMs:F2}ms");
@@ -252,7 +272,7 @@ public class ParallelArcTests : IDisposable
         
         for (int i = 0; i < arcCount; i++)
         {
-            capacityMap[graph.AddArc(source, sink)] = 10.0;
+            capacityMap[graph.AddArc(source, sink)] = 10;
         }
 
         var edmonds = new EdmondsKarp(graph, capacityMap);
@@ -261,11 +281,11 @@ public class ParallelArcTests : IDisposable
         var result = edmonds.Run(source, sink);
 
         // Assert
-        Assert.Equal(arcCount * 10.0, result.MaxFlowValue);
+        Assert.Equal(arcCount * 10, result.MaxFlowValue);
         Assert.Equal(arcCount, result.EdgeFlows.Count);
         
         output.WriteLine($"With {arcCount} parallel arcs of capacity 10 each:");
-        output.WriteLine($"  Expected flow: {arcCount * 10.0}");
+        output.WriteLine($"  Expected flow: {arcCount * 10}");
         output.WriteLine($"  Actual flow: {result.MaxFlowValue}");
     }
 }

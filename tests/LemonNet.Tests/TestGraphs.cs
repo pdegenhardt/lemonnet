@@ -16,10 +16,10 @@ public static class TestGraphs
         public ArcMap CapacityMap { get; }
         public Node Source { get; set; }
         public Node Target { get; set; }
-        public double ExpectedMaxFlow { get; }
+        public long ExpectedMaxFlow { get; }
         public string Description { get; }
         
-        public GraphData(string description, double expectedMaxFlow)
+        public GraphData(string description, long expectedMaxFlow)
         {
             Graph = new LemonDigraph();
             CapacityMap = new ArcMap(Graph);
@@ -42,7 +42,7 @@ public static class TestGraphs
     /// </summary>
     public static GraphData CreateSimpleGraph()
     {
-        var data = new GraphData("Simple 4-node graph", 29.0);
+        var data = new GraphData("Simple 4-node graph", 29);
         
         var s = data.Graph.AddNode();
         var v1 = data.Graph.AddNode();
@@ -53,11 +53,11 @@ public static class TestGraphs
         data.Target = t;
         
         // Set capacities
-        data.CapacityMap[data.Graph.AddArc(s, v1)] = 16.0;
-        data.CapacityMap[data.Graph.AddArc(s, v2)] = 13.0;
-        data.CapacityMap[data.Graph.AddArc(v1, t)] = 12.0;
-        data.CapacityMap[data.Graph.AddArc(v2, t)] = 20.0;
-        data.CapacityMap[data.Graph.AddArc(v1, v2)] = 10.0;
+        data.CapacityMap[data.Graph.AddArc(s, v1)] = 16;
+        data.CapacityMap[data.Graph.AddArc(s, v2)] = 13;
+        data.CapacityMap[data.Graph.AddArc(v1, t)] = 12;
+        data.CapacityMap[data.Graph.AddArc(v2, t)] = 20;
+        data.CapacityMap[data.Graph.AddArc(v1, v2)] = 10;
         
         return data;
     }
@@ -67,7 +67,7 @@ public static class TestGraphs
     /// </summary>
     public static GraphData CreateLinearPathGraph()
     {
-        var data = new GraphData("Linear path with bottleneck", 10.0);
+        var data = new GraphData("Linear path with bottleneck", 10);
         
         var s = data.Graph.AddNode();
         var v1 = data.Graph.AddNode();
@@ -78,9 +78,9 @@ public static class TestGraphs
         data.Target = t;
         
         // Linear path with bottleneck at v1->v2
-        data.CapacityMap[data.Graph.AddArc(s, v1)] = 20.0;
-        data.CapacityMap[data.Graph.AddArc(v1, v2)] = 10.0;  // Bottleneck
-        data.CapacityMap[data.Graph.AddArc(v2, t)] = 30.0;
+        data.CapacityMap[data.Graph.AddArc(s, v1)] = 20;
+        data.CapacityMap[data.Graph.AddArc(v1, v2)] = 10;  // Bottleneck
+        data.CapacityMap[data.Graph.AddArc(v2, t)] = 30;
         
         return data;
     }
@@ -90,7 +90,7 @@ public static class TestGraphs
     /// </summary>
     public static GraphData CreateComplexGraph()
     {
-        var data = new GraphData("Complex 6-node graph", 23.0);
+        var data = new GraphData("Complex 6-node graph", 23);
         
         var nodes = new Node[6];
         for (int i = 0; i < 6; i++)
@@ -102,7 +102,7 @@ public static class TestGraphs
         data.Target = nodes[5];
         
         // Create arcs with capacities
-        var arcs = new (int from, int to, double capacity)[]
+        var arcs = new (int from, int to, long capacity)[]
         {
             (0, 1, 16), (0, 2, 13),
             (1, 2, 10), (1, 3, 12),
@@ -125,7 +125,7 @@ public static class TestGraphs
     /// </summary>
     public static GraphData CreateDisconnectedGraph()
     {
-        var data = new GraphData("Disconnected graph", 0.0);
+        var data = new GraphData("Disconnected graph", 0);
         
         var s = data.Graph.AddNode();
         var island1 = data.Graph.AddNode();
@@ -136,8 +136,8 @@ public static class TestGraphs
         data.Target = t;
         
         // Create two disconnected components
-        data.CapacityMap[data.Graph.AddArc(s, island1)] = 10.0;
-        data.CapacityMap[data.Graph.AddArc(island2, t)] = 10.0;
+        data.CapacityMap[data.Graph.AddArc(s, island1)] = 10;
+        data.CapacityMap[data.Graph.AddArc(island2, t)] = 10;
         // No connection between island1 and island2
         
         return data;
@@ -148,7 +148,7 @@ public static class TestGraphs
     /// </summary>
     public static GraphData CreateSingleEdgeGraph()
     {
-        var data = new GraphData("Single edge graph", 15.0);
+        var data = new GraphData("Single edge graph", 15);
         
         var s = data.Graph.AddNode();
         var t = data.Graph.AddNode();
@@ -156,7 +156,7 @@ public static class TestGraphs
         data.Source = s;
         data.Target = t;
         
-        data.CapacityMap[data.Graph.AddArc(s, t)] = 15.0;
+        data.CapacityMap[data.Graph.AddArc(s, t)] = 15;
         
         return data;
     }
@@ -166,7 +166,7 @@ public static class TestGraphs
     /// </summary>
     public static GraphData CreateDiamondGraph()
     {
-        var data = new GraphData("Diamond graph", 19.0);
+        var data = new GraphData("Diamond graph", 19);
         
         var s = data.Graph.AddNode();
         var a = data.Graph.AddNode();
@@ -177,11 +177,11 @@ public static class TestGraphs
         data.Target = t;
         
         // Two paths from s to t through a and b
-        data.CapacityMap[data.Graph.AddArc(s, a)] = 10.0;
-        data.CapacityMap[data.Graph.AddArc(s, b)] = 10.0;
-        data.CapacityMap[data.Graph.AddArc(a, t)] = 10.0;
-        data.CapacityMap[data.Graph.AddArc(b, t)] = 9.0;
-        data.CapacityMap[data.Graph.AddArc(a, b)] = 1.0;  // Cross edge
+        data.CapacityMap[data.Graph.AddArc(s, a)] = 10;
+        data.CapacityMap[data.Graph.AddArc(s, b)] = 10;
+        data.CapacityMap[data.Graph.AddArc(a, t)] = 10;
+        data.CapacityMap[data.Graph.AddArc(b, t)] = 9;
+        data.CapacityMap[data.Graph.AddArc(a, b)] = 1;  // Cross edge
         
         return data;
     }
@@ -210,7 +210,7 @@ public static class TestGraphs
     /// </summary>
     public static GraphData CreateLargeLayeredGraph(int nodeCount = 100, int seed = 42)
     {
-        var data = new GraphData($"Large layered graph ({nodeCount} nodes)", -1.0); // Max flow will vary
+        var data = new GraphData($"Large layered graph ({nodeCount} nodes)", -1); // Max flow will vary
         
         var nodes = new Node[nodeCount];
         for (int i = 0; i < nodeCount; i++)

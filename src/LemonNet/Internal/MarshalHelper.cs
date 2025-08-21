@@ -13,7 +13,7 @@ internal static class MarshalHelper
     {
         public int source;
         public int target;
-        public double flow;
+        public long flow;
     }
 
     /// <summary>
@@ -71,16 +71,11 @@ internal static class MarshalHelper
     /// </summary>
     /// <param name="flowValue">The flow value to validate.</param>
     /// <exception cref="InvalidOperationException">If the flow value indicates an error.</exception>
-    internal static void ValidateFlowValue(double flowValue)
+    internal static void ValidateFlowValue(long flowValue)
     {
         if (flowValue < 0)
         {
             throw new InvalidOperationException($"Algorithm failed with error code: {flowValue}");
-        }
-
-        if (double.IsNaN(flowValue) || double.IsInfinity(flowValue))
-        {
-            throw new InvalidOperationException($"Algorithm returned invalid flow value: {flowValue}");
         }
     }
 }

@@ -8,10 +8,10 @@ namespace LemonNet;
 /// </summary>
 public class MaxFlowResult
 {
-    public double MaxFlowValue { get; }
+    public long MaxFlowValue { get; }
     public IReadOnlyList<EdgeFlow> EdgeFlows { get; }
 
-    public MaxFlowResult(double maxFlowValue, EdgeFlow[] edgeFlows)
+    public MaxFlowResult(long maxFlowValue, EdgeFlow[] edgeFlows)
     {
         MaxFlowValue = maxFlowValue;
         EdgeFlows = edgeFlows ?? Array.Empty<EdgeFlow>();

@@ -17,9 +17,9 @@ public class Preflow : IDisposable
     #region P/Invoke declarations
 
     [DllImport("lemon_wrapper", CallingConvention = CallingConvention.Cdecl)]
-    private static extern double lemon_preflow(IntPtr graph, IntPtr capacity_map,
-                                                int source, int target,
-                                                out IntPtr flow_results, out int flow_count);
+    private static extern long lemon_preflow(IntPtr graph, IntPtr capacity_map,
+                                              int source, int target,
+                                              out IntPtr flow_results, out int flow_count);
 
     [DllImport("lemon_wrapper", CallingConvention = CallingConvention.Cdecl)]
     private static extern void lemon_free_results(IntPtr results);
@@ -57,7 +57,7 @@ public class Preflow : IDisposable
     /// <param name="arc">The arc to set capacity for.</param>
     /// <param name="capacity">The capacity value.</param>
     /// <returns>This instance for method chaining.</returns>
-    public Preflow SetCapacity(Arc arc, double capacity)
+    public Preflow SetCapacity(Arc arc, long capacity)
     {
         ThrowIfDisposed();
 
@@ -111,7 +111,7 @@ public class Preflow : IDisposable
         
         try
         {
-            double maxFlowValue = lemon_preflow(
+            long maxFlowValue = lemon_preflow(
                 graph.Handle,
                 capacityMap.Handle,
                 source.Id,
