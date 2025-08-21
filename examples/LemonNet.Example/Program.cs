@@ -61,9 +61,9 @@ void RunEdmondsKarp(LemonDigraph graph, Node source, Node sink, Arc arc01, Arc a
         Console.WriteLine("Flow on each arc:");
         foreach (var flow in result.EdgeFlows)
         {
-            var source = graph.Source(flow.Arc);
+            var s = graph.Source(flow.Arc);
             var target = graph.Target(flow.Arc);
-            Console.WriteLine($"  {source} -> {target}: {flow.Flow}");
+            Console.WriteLine($"  {s} -> {target}: {flow.Flow}");
         }
     }
 }
@@ -85,9 +85,9 @@ void RunPreflow(LemonDigraph graph, Node source, Node sink, Arc arc01, Arc arc02
         Console.WriteLine("Flow on each arc:");
         foreach (var flow in result.EdgeFlows)
         {
-            var source = graph.Source(flow.Arc);
+            var s = graph.Source(flow.Arc);
             var target = graph.Target(flow.Arc);
-            Console.WriteLine($"  {source} -> {target}: {flow.Flow}");
+            Console.WriteLine($"  {s} -> {target}: {flow.Flow}");
         }
     }
 }
