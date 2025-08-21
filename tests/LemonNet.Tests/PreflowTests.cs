@@ -32,7 +32,9 @@ public class PreflowTests
         
         foreach (var flow in result.EdgeFlows)
         {
-            output.WriteLine($"Flow from {flow.Source} to {flow.Target}: {flow.Flow}");
+            var source = data.Graph.Source(flow.Arc);
+            var target = data.Graph.Target(flow.Arc);
+            output.WriteLine($"Flow from {source} to {target}: {flow.Flow}");
         }
     }
 
@@ -249,7 +251,9 @@ public class PreflowTests
         output.WriteLine($"Total edge flows: {result.EdgeFlows.Count}");
         foreach (var flow in result.EdgeFlows)
         {
-            output.WriteLine($"  Edge {flow.Source}  ->  {flow.Target}: flow = {flow.Flow}");
+            var source = data.Graph.Source(flow.Arc);
+            var target = data.Graph.Target(flow.Arc);
+            output.WriteLine($"  Arc {flow.Arc} ({source} -> {target}): flow = {flow.Flow}");
         }
 
         // Assert - Verify flow conservation at all nodes
@@ -260,21 +264,27 @@ public class PreflowTests
         // We need to track all nodes that appear in the flow results
         foreach (var flow in result.EdgeFlows)
         {
-            if (!flowIn.ContainsKey(flow.Source))
-                flowIn[flow.Source] = 0;
-            if (!flowIn.ContainsKey(flow.Target))
-                flowIn[flow.Target] = 0;
-            if (!flowOut.ContainsKey(flow.Source))
-                flowOut[flow.Source] = 0;
-            if (!flowOut.ContainsKey(flow.Target))
-                flowOut[flow.Target] = 0;
+            var source = data.Graph.Source(flow.Arc);
+            var target = data.Graph.Target(flow.Arc);
+            
+            if (!flowIn.ContainsKey(source))
+                flowIn[source] = 0;
+            if (!flowIn.ContainsKey(target))
+                flowIn[target] = 0;
+            if (!flowOut.ContainsKey(source))
+                flowOut[source] = 0;
+            if (!flowOut.ContainsKey(target))
+                flowOut[target] = 0;
         }
 
         // Calculate total flow in and out for each node
         foreach (var flow in result.EdgeFlows)
         {
-            flowOut[flow.Source] += flow.Flow;
-            flowIn[flow.Target] += flow.Flow;
+            var source = data.Graph.Source(flow.Arc);
+            var target = data.Graph.Target(flow.Arc);
+            
+            flowOut[source] += flow.Flow;
+            flowIn[target] += flow.Flow;
         }
 
         // The key insight: max flow algorithms may not return all edges, only those with positive flow

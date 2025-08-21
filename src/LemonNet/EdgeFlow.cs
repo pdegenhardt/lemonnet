@@ -3,35 +3,32 @@ using System;
 namespace LemonNet;
 
 /// <summary>
-/// Represents the flow on a single edge.
-/// This is a lightweight value type containing the source, target, and flow amount.
+/// Represents the flow on a single arc.
+/// This is a lightweight value type containing the arc and its flow amount.
 /// </summary>
 public readonly struct EdgeFlow : IEquatable<EdgeFlow>
 {
-    public Node Source { get; }
-    public Node Target { get; }
+    public Arc Arc { get; }
     public long Flow { get; }
 
-    public EdgeFlow(Node source, Node target, long flow)
+    public EdgeFlow(Arc arc, long flow)
     {
-        Source = source;
-        Target = target;
+        Arc = arc;
         Flow = flow;
     }
 
     public bool Equals(EdgeFlow other) =>
-        Source.Equals(other.Source) &&
-        Target.Equals(other.Target) &&
+        Arc.Equals(other.Arc) &&
         Flow.Equals(other.Flow);
 
     public override bool Equals(object obj) =>
         obj is EdgeFlow flow && Equals(flow);
 
     public override int GetHashCode() =>
-        HashCode.Combine(Source, Target, Flow);
+        HashCode.Combine(Arc, Flow);
 
     public override string ToString() =>
-        $"Edge({Source} -> {Target}): Flow = {Flow}";
+        $"Arc {Arc}: Flow = {Flow}";
 
     public static bool operator ==(EdgeFlow left, EdgeFlow right) =>
         left.Equals(right);

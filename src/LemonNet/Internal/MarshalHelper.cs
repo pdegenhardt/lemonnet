@@ -11,8 +11,7 @@ internal static class MarshalHelper
     [StructLayout(LayoutKind.Sequential)]
     internal struct NativeFlowResult
     {
-        public int source;
-        public int target;
+        public int arc_id;
         public long flow;
     }
 
@@ -53,11 +52,10 @@ internal static class MarshalHelper
                 ref readonly var r = ref results[i];
                 
                 // Additional validation could be added here if needed
-                // For example, checking that source and target node IDs are non-negative
+                // For example, checking that arc ID is non-negative
                 
                 edgeFlows[i] = new EdgeFlow(
-                    new Node(r.source),
-                    new Node(r.target),
+                    new Arc(r.arc_id),
                     r.flow
                 );
             }

@@ -209,20 +209,12 @@ LEMON_API long long lemon_edmonds_karp(LemonGraph graph, LemonArcMap capacity_ma
     long long max_flow = ek.flowValue();
     
     std::vector<FlowResult> results;
-    std::map<SmartDigraph::Node, int> node_to_index;
-    for (size_t i = 0; i < graph_wrapper->nodes.size(); ++i) {
-        node_to_index[graph_wrapper->nodes[i]] = static_cast<int>(i);
-    }
     
-    for (const auto& arc : graph_wrapper->arcs) {
-        long long flow = flow_map[arc];
+    for (size_t i = 0; i < graph_wrapper->arcs.size(); ++i) {
+        long long flow = flow_map[graph_wrapper->arcs[i]];
         if (flow > 0) {
-            SmartDigraph::Node src = graph_wrapper->graph.source(arc);
-            SmartDigraph::Node tgt = graph_wrapper->graph.target(arc);
-            
             FlowResult result;
-            result.source = node_to_index[src];
-            result.target = node_to_index[tgt];
+            result.arc_id = static_cast<int>(i);
             result.flow = flow;
             results.push_back(result);
         }
@@ -278,20 +270,12 @@ LEMON_API long long lemon_preflow(LemonGraph graph, LemonArcMap capacity_map,
     long long max_flow = pf.flowValue();
     
     std::vector<FlowResult> results;
-    std::map<SmartDigraph::Node, int> node_to_index;
-    for (size_t i = 0; i < graph_wrapper->nodes.size(); ++i) {
-        node_to_index[graph_wrapper->nodes[i]] = static_cast<int>(i);
-    }
     
-    for (const auto& arc : graph_wrapper->arcs) {
-        long long flow = flow_map[arc];
+    for (size_t i = 0; i < graph_wrapper->arcs.size(); ++i) {
+        long long flow = flow_map[graph_wrapper->arcs[i]];
         if (flow > 0) {
-            SmartDigraph::Node src = graph_wrapper->graph.source(arc);
-            SmartDigraph::Node tgt = graph_wrapper->graph.target(arc);
-            
             FlowResult result;
-            result.source = node_to_index[src];
-            result.target = node_to_index[tgt];
+            result.arc_id = static_cast<int>(i);
             result.flow = flow;
             results.push_back(result);
         }

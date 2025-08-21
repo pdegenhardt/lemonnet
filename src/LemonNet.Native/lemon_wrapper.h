@@ -19,8 +19,7 @@ typedef void* LemonGraph;
 typedef void* LemonArcMap;
 
 typedef struct {
-    int source;
-    int target;
+    int arc_id;      // The arc identifier
     long long flow;  // Use long long (64-bit) to match C# long
 } FlowResult;
 

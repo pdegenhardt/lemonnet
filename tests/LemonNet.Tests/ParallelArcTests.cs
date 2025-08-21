@@ -95,7 +95,9 @@ public class ParallelArcTests : IDisposable
         output.WriteLine($"Total edge flows: {result.EdgeFlows.Count}");
         foreach (var flow in result.EdgeFlows)
         {
-            output.WriteLine($"  Edge {flow.Source} -> {flow.Target}: flow = {flow.Flow}");
+            var s = graph.Source(flow.Arc);
+            var target = graph.Target(flow.Arc);
+            output.WriteLine($"  Arc {flow.Arc} ({s} -> {target}): flow = {flow.Flow}");
         }
 
         // Assert
@@ -110,7 +112,9 @@ public class ParallelArcTests : IDisposable
         {
             if (flow.Flow < 0 || flow.Flow > 1000000)
             {
-                output.WriteLine($"WARNING: Suspicious flow value {flow.Flow} on edge {flow.Source} -> {flow.Target}");
+                var s = graph.Source(flow.Arc);
+                var target = graph.Target(flow.Arc);
+                output.WriteLine($"WARNING: Suspicious flow value {flow.Flow} on arc {flow.Arc} ({s} -> {target})");
             }
         }
         
@@ -119,7 +123,9 @@ public class ParallelArcTests : IDisposable
         output.WriteLine($"Total max flow through parallel arcs: {result.MaxFlowValue}");
         foreach (var flow in result.EdgeFlows)
         {
-            output.WriteLine($"  Arc from {flow.Source} to {flow.Target}: {flow.Flow}");
+            var s = graph.Source(flow.Arc);
+            var target = graph.Target(flow.Arc);
+            output.WriteLine($"  Arc {flow.Arc} from {s} to {target}: {flow.Flow}");
         }
     }
 
