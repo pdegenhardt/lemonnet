@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./build.sh)",
+      "Bash(cp:*)",
+      "Bash(dotnet build:*)",
+      "Bash(rm:*)",
+      "Bash(LD_LIBRARY_PATH=. dotnet LemonNetTest.dll)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet add reference:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet test:*)",
+      "Bash(mkdir:*)",
+      "Bash(LD_LIBRARY_PATH=../../src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test --no-build)",
+      "Bash(LD_LIBRARY_PATH=../../src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.csproj --no-build)",
+      "Bash(LD_LIBRARY_PATH=../../src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.csproj --no-build --filter \"FullyQualifiedName~PreflowTests.SimpleGraph|FullyQualifiedName~PreflowTests.CompareWithEdmondsKarp_AllGraphs\")",
+      "Bash(LD_LIBRARY_PATH=../../src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.csproj --no-build --filter \"FullyQualifiedName~EdmondsKarpTests.SimpleGraph\")",
+      "Bash(LD_LIBRARY_PATH=src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test tests/LemonNet.Tests/LemonNet.Tests.csproj --no-build)",
+      "Bash(LD_LIBRARY_PATH=../../src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test --no-build --filter \"FullyQualifiedName~FlowConservation\")",
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(LD_LIBRARY_PATH=src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test tests/LemonNet.Tests --no-build --filter \"EdmondsKarpTests.SimpleGraph_ReturnsCorrectMaxFlow\")",
+      "Bash(LD_LIBRARY_PATH=src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test tests/LemonNet.Tests --no-build --filter \"EdmondsKarpTests.SimpleGraph_ReturnsCorrectMaxFlow\" -v n)",
+      "Bash(LD_LIBRARY_PATH=/mnt/c/Dev/Claude/lemonnet/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.dll --filter \"EdmondsKarpTests.SimpleGraph_ReturnsCorrectMaxFlow\")",
+      "Bash(LD_LIBRARY_PATH=/mnt/c/Dev/Claude/lemonnet/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.dll --filter \"EdmondsKarpTests.FlowConservation\" -v n)",
+      "Bash(LD_LIBRARY_PATH=/mnt/c/Dev/Claude/lemonnet/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.dll --filter \"EdmondsKarpTests.FlowConservation\")",
+      "Bash(LD_LIBRARY_PATH=/mnt/c/Dev/Claude/lemonnet/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.dll --filter \"EdmondsKarpTests\")",
+      "Bash(LD_LIBRARY_PATH=/mnt/c/Dev/Claude/lemonnet/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.dll)",
+      "Bash(LD_LIBRARY_PATH=/mnt/c/Dev/Claude/lemonnet/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.dll --filter \"ParallelArcTests.MaxFlow_ParallelArcs_SumsCapacities\" -v detailed)",
+      "Bash(dir:*)",
+      "Bash(msbuild:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
