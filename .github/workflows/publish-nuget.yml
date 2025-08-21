@@ -59,10 +59,12 @@ jobs:
       run: |
         msbuild src\LemonNet.Native\LemonWrapper.Native.vcxproj /p:Configuration=Release /p:Platform=x64
     
-    - name: Copy Windows native library to runtime directory
+    - name: Verify Windows native library was copied
       run: |
-        mkdir -p src\LemonNet\runtimes\win-x64\native
-        copy src\LemonNet.Native\bin\x64\Release\lemon_wrapper.dll src\LemonNet\runtimes\win-x64\native\
+        if (!(Test-Path "src\LemonNet\runtimes\win-x64\native\lemon_wrapper.dll")) {
+          Write-Error "Native library not found at expected location"
+          exit 1
+        }
     
     - name: Upload Windows native library
       uses: actions/upload-artifact@v4
