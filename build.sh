@@ -14,8 +14,9 @@ CONFIGURATION=${1:-Debug}
 # Create the output directory if it doesn't exist
 mkdir -p ../LemonNet/bin/$CONFIGURATION/net9.0
 
-# Compile the wrapper
+# Compile the wrapper with static libstdc++ to avoid version issues
 g++ -fPIC -shared -O2 -std=c++11 \
+    -static-libstdc++ -static-libgcc \
     $LEMON_INCLUDE \
     lemon_wrapper.cpp \
     lemon-1.3.1/lemon/bits/windows.cc \
