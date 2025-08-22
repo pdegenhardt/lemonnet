@@ -17,7 +17,7 @@ env:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Use Ubuntu 22.04 for GLIBC 2.35 compatibility
     steps:
     - uses: actions/checkout@v4
     
@@ -31,10 +31,23 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y g++ make
     
+    - name: Check GLIBC version
+      run: |
+        echo "GLIBC version on build system:"
+        ldd --version | head -n1
+    
     - name: Build native library (Linux)
       run: |
         chmod +x build.sh
         ./build.sh Release
+    
+    - name: Check library dependencies
+      run: |
+        echo "Library dependencies:"
+        ldd src/LemonNet/bin/Release/net9.0/lemon_wrapper.so || true
+        echo ""
+        echo "Required GLIBC versions:"
+        objdump -T src/LemonNet/bin/Release/net9.0/lemon_wrapper.so | grep GLIBC | sed 's/.*GLIBC_/GLIBC_/' | sort -u || true
     
     - name: Upload Linux native library
       uses: actions/upload-artifact@v4
