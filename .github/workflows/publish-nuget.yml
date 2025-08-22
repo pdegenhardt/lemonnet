@@ -103,6 +103,9 @@ jobs:
     - name: Set permissions for native library
       run: chmod +x src/LemonNet/bin/Release/net9.0/lemon_wrapper.so
     
+    - name: Create packages directory for NuGet.config
+      run: mkdir -p packages
+    
     - name: Restore dependencies
       run: |
         dotnet restore src/LemonNet/LemonNet.csproj
