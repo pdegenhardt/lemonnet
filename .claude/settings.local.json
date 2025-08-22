@@ -29,7 +29,8 @@
       "Bash(LD_LIBRARY_PATH=/mnt/c/Dev/Claude/lemonnet/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.dll)",
       "Bash(LD_LIBRARY_PATH=/mnt/c/Dev/Claude/lemonnet/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH dotnet test LemonNet.Tests.dll --filter \"ParallelArcTests.MaxFlow_ParallelArcs_SumsCapacities\" -v detailed)",
       "Bash(dir:*)",
-      "Bash(msbuild:*)"
+      "Bash(msbuild:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

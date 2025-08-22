@@ -32,14 +32,30 @@ This is a C# wrapper for the LEMON (Library for Efficient Modeling and Optimizat
 ### Command Line Build
 ```cmd
 # Requires VS Developer Command Prompt
-msbuild LemonNet.sln /p:Configuration=Debug /p:Platform=x64
+dotnet restore LemonNet.sln
+msbuild LemonNet.sln /p:Configuration=Release /p:Platform=x64
 ```
+
+### Creating NuGet Package
+```cmd
+# From VS Developer Command Prompt
+# 1. Restore packages
+dotnet restore LemonNet.sln
+
+# 2. Build entire solution (including native C++ project)
+msbuild LemonNet.sln /p:Configuration=Release /p:Platform=x64
+
+# 3. Create NuGet package
+msbuild src/LemonNet/LemonNet.csproj /t:Pack /p:Configuration=Release
+```
+
+Note: `dotnet pack` cannot be used directly because it doesn't support C++ project references. Use MSBuild's Pack target instead.
 
 ### Native Library Only (if needed)
 ```cmd
 # From VS Developer Command Prompt
 cd src\LemonNet.Native
-msbuild LemonWrapper.Native.vcxproj /p:Configuration=Debug /p:Platform=x64
+msbuild LemonWrapper.Native.vcxproj /p:Configuration=Release /p:Platform=x64
 ```
 
 ## Running Tests

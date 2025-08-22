@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Copy native binaries to output directory -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\lib\net9.0\lemon_wrapper.dll" Condition="'$(OS)' == 'Windows_NT' and Exists('$(MSBuildThisFileDirectory)..\..\lib\net9.0\lemon_wrapper.dll')">
+      <Link>lemon_wrapper.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\lib\net9.0\lemon_wrapper.pdb" Condition="'$(OS)' == 'Windows_NT' and Exists('$(MSBuildThisFileDirectory)..\..\lib\net9.0\lemon_wrapper.pdb')">
+      <Link>lemon_wrapper.pdb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\..\lib\net9.0\lemon_wrapper.so" Condition="'$(OS)' != 'Windows_NT' and Exists('$(MSBuildThisFileDirectory)..\..\lib\net9.0\lemon_wrapper.so')">
+      <Link>lemon_wrapper.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

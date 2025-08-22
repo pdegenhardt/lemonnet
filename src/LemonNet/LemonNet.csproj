@@ -19,12 +19,16 @@
     <PackageIcon>icon.png</PackageIcon>
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <PlatformTarget>x64</PlatformTarget>
+    <!-- Include symbols in NuGet package -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <!-- Native files to include in NuGet package (both platforms) -->
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="" />
     <None Include="..\..\icon.png" Pack="true" PackagePath="" />
+    <None Include="LemonNet.targets" Pack="true" PackagePath="build" />
   </ItemGroup>
 
   <!-- Reference the native project to ensure build order (Windows only) -->
@@ -40,6 +44,14 @@
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <None Include="..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll" 
           Condition="Exists('..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+      <Pack>true</Pack>
+      <PackagePath>lib\net9.0</PackagePath>
+    </None>
+    <!-- Include native PDB for debugging -->
+    <None Include="..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.pdb" 
+          Condition="Exists('..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.pdb')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
       <Pack>true</Pack>

@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LemonNet" Version="0.1.250821.840" />
+    <PackageReference Include="LemonNet" Version="0.1.0" />
   </ItemGroup>
 
 </Project>
