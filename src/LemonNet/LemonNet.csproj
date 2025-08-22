@@ -40,22 +40,34 @@
     </ProjectReference>
   </ItemGroup>
   
-  <!-- Windows: Copy native DLL to output directory -->
+  <!-- Windows: Copy native DLL to output directory when on Windows -->
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <None Include="..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll" 
           Condition="Exists('..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
-      <Pack>true</Pack>
-      <PackagePath>lib\net9.0</PackagePath>
     </None>
     <!-- Include native PDB for debugging -->
     <None Include="..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.pdb" 
           Condition="Exists('..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.pdb')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+  
+  <!-- Pack Windows native DLL (no OS condition so it works from any build platform) -->
+  <ItemGroup>
+    <None Include="..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll" 
+          Condition="Exists('..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll')">
       <Pack>true</Pack>
       <PackagePath>lib\net9.0</PackagePath>
+      <Visible>false</Visible>
+    </None>
+    <None Include="..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.pdb" 
+          Condition="Exists('..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.pdb')">
+      <Pack>true</Pack>
+      <PackagePath>lib\net9.0</PackagePath>
+      <Visible>false</Visible>
     </None>
   </ItemGroup>
   
