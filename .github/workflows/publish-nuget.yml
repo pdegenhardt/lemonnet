@@ -40,7 +40,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: linux-native
-        path: src/LemonNet/runtimes/linux-x64/native/lemon_wrapper.so
+        path: src/LemonNet/bin/Release/net9.0/lemon_wrapper.so
 
   build-windows:
     runs-on: windows-latest
@@ -59,9 +59,14 @@ jobs:
       run: |
         msbuild src\LemonNet.Native\LemonWrapper.Native.vcxproj /p:Configuration=Release /p:Platform=x64
     
+    - name: Copy Windows native library to output directory
+      run: |
+        New-Item -ItemType Directory -Force -Path "src\LemonNet\bin\Release\net9.0"
+        Copy-Item "src\LemonNet.Native\bin\x64\Release\lemon_wrapper.dll" -Destination "src\LemonNet\bin\Release\net9.0\lemon_wrapper.dll"
+    
     - name: Verify Windows native library was copied
       run: |
-        if (!(Test-Path "src\LemonNet\runtimes\win-x64\native\lemon_wrapper.dll")) {
+        if (!(Test-Path "src\LemonNet\bin\Release\net9.0\lemon_wrapper.dll")) {
           Write-Error "Native library not found at expected location"
           exit 1
         }
@@ -70,7 +75,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: windows-native
-        path: src/LemonNet/runtimes/win-x64/native/lemon_wrapper.dll
+        path: src/LemonNet/bin/Release/net9.0/lemon_wrapper.dll
 
   test-and-publish:
     needs: [build-linux, build-windows]
@@ -87,16 +92,16 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: linux-native
-        path: src/LemonNet/runtimes/linux-x64/native/
+        path: src/LemonNet/bin/Release/net9.0/
     
     - name: Download Windows native library
       uses: actions/download-artifact@v4
       with:
         name: windows-native
-        path: src/LemonNet/runtimes/win-x64/native/
+        path: src/LemonNet/bin/Release/net9.0/
     
     - name: Set permissions for native library
-      run: chmod +x src/LemonNet/runtimes/linux-x64/native/lemon_wrapper.so
+      run: chmod +x src/LemonNet/bin/Release/net9.0/lemon_wrapper.so
     
     - name: Restore dependencies
       run: |
@@ -110,7 +115,6 @@ jobs:
     
     - name: Test
       run: |
-        export LD_LIBRARY_PATH=$PWD/src/LemonNet/runtimes/linux-x64/native:$LD_LIBRARY_PATH
         dotnet test tests/LemonNet.Tests/LemonNet.Tests.csproj --configuration Release --no-build --verbosity normal
     
     - name: Calculate version

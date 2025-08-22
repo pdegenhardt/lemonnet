@@ -48,11 +48,11 @@
   </ItemGroup>
   
   <!-- Linux: Include native SO if it exists (built by build.sh) -->
-  <!-- Only pack it if it exists, don't require it for Windows builds -->
+  <!-- The .so file is built directly to the output directory by build.sh, so we only need to pack it -->
   <ItemGroup>
-    <None Include="bin\$(Configuration)\net9.0\lemon_wrapper.so" 
-          Condition="Exists('bin\$(Configuration)\net9.0\lemon_wrapper.so')">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Include="$(OutputPath)lemon_wrapper.so" 
+          Condition="Exists('$(OutputPath)lemon_wrapper.so')">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <Visible>false</Visible>
       <Pack>true</Pack>
       <PackagePath>lib\net9.0</PackagePath>
