@@ -34,7 +34,7 @@ jobs:
     - name: Build native library (Linux)
       run: |
         chmod +x build.sh
-        ./build.sh
+        ./build.sh Release
     
     - name: Upload Linux native library
       uses: actions/upload-artifact@v4
