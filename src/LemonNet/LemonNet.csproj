@@ -21,25 +21,10 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
+  <!-- Native files to include in NuGet package (both platforms) -->
   <ItemGroup>
-    <None Remove="runtimes\win-x64\native\lemon_wrapper.dll" />
-  </ItemGroup>
-
-  <!-- Native files to include in NuGet package -->
-  <ItemGroup>
-    <Content Include="runtimes\win-x64\native\lemon_wrapper.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Condition="Exists('runtimes\win-x64\native\lemon_wrapper.dll')" />
-    <Content Include="runtimes\linux-x64\native\lemon_wrapper.so" Pack="true" PackagePath="runtimes\linux-x64\native\" Condition="Exists('runtimes\linux-x64\native\lemon_wrapper.so')" />
     <None Include="..\..\README.md" Pack="true" PackagePath="" />
     <None Include="..\..\icon.png" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <!-- Automatically copy native DLL to output directory -->
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-    <None Include="runtimes\win-x64\native\lemon_wrapper.dll" Condition="Exists('runtimes\win-x64\native\lemon_wrapper.dll')">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>lemon_wrapper.dll</Link>
-      <Visible>false</Visible>
-    </None>
   </ItemGroup>
 
   <!-- Reference the native project to ensure build order (Windows only) -->
@@ -51,26 +36,39 @@
     </ProjectReference>
   </ItemGroup>
   
-  <!-- Linux/Unix: Copy the .so file if it exists -->
-  <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
-    <None Include="..\..\lemon_wrapper.so" Condition="Exists('..\..\lemon_wrapper.so')">
+  <!-- Windows: Copy native DLL to output directory -->
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <None Include="..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll" 
+          Condition="Exists('..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>lemon_wrapper.so</Link>
       <Visible>false</Visible>
+      <Pack>true</Pack>
+      <PackagePath>lib\net9.0</PackagePath>
     </None>
   </ItemGroup>
+  
+  <!-- Linux: Include native SO if it exists (built by build.sh) -->
+  <!-- Only pack it if it exists, don't require it for Windows builds -->
   <ItemGroup>
-    <Folder Include="runtimes\win-x64\native\" />
+    <None Include="bin\$(Configuration)\net9.0\lemon_wrapper.so" 
+          Condition="Exists('bin\$(Configuration)\net9.0\lemon_wrapper.so')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+      <Pack>true</Pack>
+      <PackagePath>lib\net9.0</PackagePath>
+    </None>
   </ItemGroup>
 
-  <!-- Post-build event to copy native DLL from build output to runtimes directory -->
+  <!-- Post-build event to ensure native library is in place (Windows) -->
   <Target Name="CopyNativeDLL" AfterTargets="Build" Condition="'$(OS)' == 'Windows_NT'">
     <PropertyGroup>
       <NativeBuildOutput>$(ProjectDir)..\LemonNet.Native\bin\x64\$(Configuration)\lemon_wrapper.dll</NativeBuildOutput>
-      <NativeTargetDir>$(ProjectDir)runtimes\win-x64\native\</NativeTargetDir>
     </PropertyGroup>
-    <Message Text="Copying native DLL from $(NativeBuildOutput) to $(NativeTargetDir)" Importance="high" />
-    <Copy SourceFiles="$(NativeBuildOutput)" DestinationFolder="$(NativeTargetDir)" Condition="Exists('$(NativeBuildOutput)')" />
+    <Message Text="Copying native DLL from $(NativeBuildOutput) to $(OutputPath)" Importance="high" />
+    <Copy SourceFiles="$(NativeBuildOutput)" 
+          DestinationFolder="$(OutputPath)" 
+          Condition="Exists('$(NativeBuildOutput)')" 
+          SkipUnchangedFiles="true" />
   </Target>
 
 </Project>

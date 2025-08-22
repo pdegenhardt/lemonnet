@@ -50,6 +50,61 @@ struct ArcMapWrapper {
     }
 };
 
+// Template function for running max flow algorithms
+template<typename Algorithm>
+static long long run_max_flow_algorithm(LemonGraph graph, LemonArcMap capacity_map,
+                                        int source, int target,
+                                        FlowResult** flow_results, int* flow_count) {
+    if (!graph || !capacity_map || !flow_results || !flow_count) return -1;
+    
+    GraphWrapper* graph_wrapper = static_cast<GraphWrapper*>(graph);
+    ArcMapWrapper* capacity_wrapper = static_cast<ArcMapWrapper*>(capacity_map);
+    
+    if (source < 0 || source >= static_cast<int>(graph_wrapper->nodes.size()) ||
+        target < 0 || target >= static_cast<int>(graph_wrapper->nodes.size())) {
+        *flow_results = nullptr;
+        *flow_count = 0;
+        return -1;
+    }
+    
+    SmartDigraph::ArcMap<long> flow_map(graph_wrapper->graph);
+    Algorithm alg(graph_wrapper->graph, *(capacity_wrapper->map),
+                  graph_wrapper->nodes[source], graph_wrapper->nodes[target]);
+    alg.flowMap(flow_map);
+    
+    alg.run();
+    
+    long long max_flow = alg.flowValue();
+    
+    std::vector<FlowResult> results;
+    
+    for (size_t i = 0; i < graph_wrapper->arcs.size(); ++i) {
+        long long flow = flow_map[graph_wrapper->arcs[i]];
+        if (flow > 0) {
+            FlowResult result;
+            result.arc_id = static_cast<int>(i);
+            result.flow = flow;
+            results.push_back(result);
+        }
+    }
+    
+    if (results.empty()) {
+        *flow_count = 0;
+        *flow_results = nullptr;
+    } else {
+        *flow_count = static_cast<int>(results.size());
+        *flow_results = static_cast<FlowResult*>(malloc(sizeof(FlowResult) * results.size()));
+        if (*flow_results) {
+            memcpy(*flow_results, results.data(), sizeof(FlowResult) * results.size());
+        } else {
+            *flow_count = 0;
+            return -1;
+        }
+    }
+    
+    return max_flow;
+}
+
 extern "C" {
 
 LEMON_API LemonGraph lemon_create_graph() {
@@ -186,55 +241,9 @@ LEMON_API long long lemon_get_arc_value_long(LemonArcMap map, int arc) {
 LEMON_API long long lemon_edmonds_karp(LemonGraph graph, LemonArcMap capacity_map,
                                    int source, int target, 
                                    FlowResult** flow_results, int* flow_count) {
-    if (!graph || !capacity_map || !flow_results || !flow_count) return -1;
-    
-    GraphWrapper* graph_wrapper = static_cast<GraphWrapper*>(graph);
-    ArcMapWrapper* capacity_wrapper = static_cast<ArcMapWrapper*>(capacity_map);
-    
-    if (source < 0 || source >= static_cast<int>(graph_wrapper->nodes.size()) ||
-        target < 0 || target >= static_cast<int>(graph_wrapper->nodes.size())) {
-        *flow_results = nullptr;
-        *flow_count = 0;
-        return -1;
-    }
-    
     typedef EdmondsKarp<SmartDigraph, SmartDigraph::ArcMap<long>> EK;
-    SmartDigraph::ArcMap<long> flow_map(graph_wrapper->graph);
-    EK ek(graph_wrapper->graph, *(capacity_wrapper->map), 
-          graph_wrapper->nodes[source], graph_wrapper->nodes[target]);
-    ek.flowMap(flow_map);
-    
-    ek.run();
-    
-    long long max_flow = ek.flowValue();
-    
-    std::vector<FlowResult> results;
-    
-    for (size_t i = 0; i < graph_wrapper->arcs.size(); ++i) {
-        long long flow = flow_map[graph_wrapper->arcs[i]];
-        if (flow > 0) {
-            FlowResult result;
-            result.arc_id = static_cast<int>(i);
-            result.flow = flow;
-            results.push_back(result);
-        }
-    }
-    
-    if (results.empty()) {
-        *flow_count = 0;
-        *flow_results = nullptr;
-    } else {
-        *flow_count = static_cast<int>(results.size());
-        *flow_results = static_cast<FlowResult*>(malloc(sizeof(FlowResult) * results.size()));
-        if (*flow_results) {
-            memcpy(*flow_results, results.data(), sizeof(FlowResult) * results.size());
-        } else {
-            *flow_count = 0;
-            return -1;
-        }
-    }
-    
-    return max_flow;
+    return run_max_flow_algorithm<EK>(graph, capacity_map, source, target, 
+                                      flow_results, flow_count);
 }
 
 LEMON_API void lemon_free_results(FlowResult* results) {
@@ -243,59 +252,12 @@ LEMON_API void lemon_free_results(FlowResult* results) {
     }
 }
 
-// Preflow algorithm implementation
 LEMON_API long long lemon_preflow(LemonGraph graph, LemonArcMap capacity_map,
                               int source, int target,
                               FlowResult** flow_results, int* flow_count) {
-    if (!graph || !capacity_map || !flow_results || !flow_count) return -1;
-    
-    GraphWrapper* graph_wrapper = static_cast<GraphWrapper*>(graph);
-    ArcMapWrapper* capacity_wrapper = static_cast<ArcMapWrapper*>(capacity_map);
-    
-    if (source < 0 || source >= static_cast<int>(graph_wrapper->nodes.size()) ||
-        target < 0 || target >= static_cast<int>(graph_wrapper->nodes.size())) {
-        *flow_results = nullptr;
-        *flow_count = 0;
-        return -1;
-    }
-    
     typedef Preflow<SmartDigraph, SmartDigraph::ArcMap<long>> PF;
-    SmartDigraph::ArcMap<long> flow_map(graph_wrapper->graph);
-    PF pf(graph_wrapper->graph, *(capacity_wrapper->map),
-          graph_wrapper->nodes[source], graph_wrapper->nodes[target]);
-    pf.flowMap(flow_map);
-    
-    pf.run();
-    
-    long long max_flow = pf.flowValue();
-    
-    std::vector<FlowResult> results;
-    
-    for (size_t i = 0; i < graph_wrapper->arcs.size(); ++i) {
-        long long flow = flow_map[graph_wrapper->arcs[i]];
-        if (flow > 0) {
-            FlowResult result;
-            result.arc_id = static_cast<int>(i);
-            result.flow = flow;
-            results.push_back(result);
-        }
-    }
-    
-    if (results.empty()) {
-        *flow_count = 0;
-        *flow_results = nullptr;
-    } else {
-        *flow_count = static_cast<int>(results.size());
-        *flow_results = static_cast<FlowResult*>(malloc(sizeof(FlowResult) * results.size()));
-        if (*flow_results) {
-            memcpy(*flow_results, results.data(), sizeof(FlowResult) * results.size());
-        } else {
-            *flow_count = 0;
-            return -1;
-        }
-    }
-    
-    return max_flow;
+    return run_max_flow_algorithm<PF>(graph, capacity_map, source, target,
+                                      flow_results, flow_count);
 }
 
 } // extern "C"

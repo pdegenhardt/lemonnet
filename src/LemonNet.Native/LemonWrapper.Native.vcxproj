@@ -104,12 +104,14 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   
-  <!-- Copy output to LemonNet runtimes folder -->
-  <Target Name="CopyToRuntimes" AfterTargets="Build">
-    <PropertyGroup>
-      <RuntimeDir>$(SolutionDir)src\LemonNet\runtimes\win-x64\native\</RuntimeDir>
-    </PropertyGroup>
-    <MakeDir Directories="$(RuntimeDir)" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(RuntimeDir)" />
+  <!-- Build Linux native library via WSL after Windows build -->
+  <Target Name="BuildLinuxNative" AfterTargets="Build">
+    <Message Text="Building Linux native library via WSL..." Importance="high" />
+    <Exec Command="&quot;$(ProjectDir)build-linux.bat&quot; $(Configuration)" 
+          ContinueOnError="true"
+          ConsoleToMSBuild="true">
+      <Output TaskParameter="ExitCode" PropertyName="LinuxBuildExitCode" />
+    </Exec>
+    <Message Text="Linux build completed (exit code: $(LinuxBuildExitCode))" Importance="high" />
   </Target>
 </Project>

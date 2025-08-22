@@ -72,10 +72,10 @@ namespace lemon {
 - Define `WIN32`, `_WIN32`, `_WINDOWS` preprocessor macros
 - `LEMON_WRAPPER_EXPORTS` must be defined when building the DLL
 
-### Native DLL Location Flow
-1. Native build outputs to: `build/x64/[Debug|Release]/lemon_wrapper.dll`
-2. Post-build copies to: `src/LemonNet/runtimes/win-x64/native/`
-3. LemonNet project copies to its output and test project output
+### Native Library Location Flow
+1. Windows: Native build outputs to `src/LemonNet.Native/bin/x64/[Debug|Release]/lemon_wrapper.dll`
+2. Linux: build.sh outputs to `src/LemonNet/bin/[Debug|Release]/net9.0/lemon_wrapper.so`
+3. Both libraries are co-located with LemonNet.dll in the same output folder
 
 ### Platform Configuration
 - Solution platform: `x64`
@@ -87,7 +87,7 @@ namespace lemon {
 
 ### DllNotFoundException
 - Ensure native project built successfully
-- Check `src/LemonNet/runtimes/win-x64/native/` contains `lemon_wrapper.dll`
+- Check that `lemon_wrapper.dll` (Windows) or `lemon_wrapper.so` (Linux) exists in the output folder alongside `LemonNet.dll`
 - Verify DLL is x64: `file lemon_wrapper.dll` should show "PE32+ executable"
 
 ### BadImageFormatException
