@@ -22,4 +22,27 @@
     <ProjectReference Include="..\..\src\LemonNet\LemonNet.csproj" />
   </ItemGroup>
 
+  <!-- Copy native libraries from LemonNet output to test output -->
+  <Target Name="CopyNativeLibraries" AfterTargets="Build">
+    <!-- Windows -->
+    <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+      <NativeLibraries Include="$(ProjectDir)..\..\src\LemonNet\bin\$(Configuration)\$(TargetFramework)\lemon_wrapper.dll" 
+                       Condition="Exists('$(ProjectDir)..\..\src\LemonNet\bin\$(Configuration)\$(TargetFramework)\lemon_wrapper.dll')" />
+    </ItemGroup>
+    <!-- Linux -->
+    <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
+      <NativeLibraries Include="$(ProjectDir)../../src/LemonNet/bin/$(Configuration)/$(TargetFramework)/lemon_wrapper.so" 
+                       Condition="Exists('$(ProjectDir)../../src/LemonNet/bin/$(Configuration)/$(TargetFramework)/lemon_wrapper.so')" />
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(NativeLibraries)" 
+          DestinationFolder="$(OutputPath)" 
+          SkipUnchangedFiles="true" 
+          Condition="'@(NativeLibraries)' != ''" />
+    
+    <Message Text="Copied native libraries to test output: @(NativeLibraries)" 
+             Importance="high" 
+             Condition="'@(NativeLibraries)' != ''" />
+  </Target>
+
 </Project>
