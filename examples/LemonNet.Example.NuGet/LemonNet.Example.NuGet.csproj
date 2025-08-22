@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <!-- Reference the published NuGet package instead of local project -->
-    <PackageReference Include="LemonNet" Version="0.1.250822.413" />
+    <PackageReference Include="LemonNet" Version="0.1.250822.430" />
   </ItemGroup>
 
 </Project>
