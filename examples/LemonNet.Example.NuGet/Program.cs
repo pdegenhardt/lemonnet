@@ -3,8 +3,6 @@ using LemonNet;
 Console.WriteLine("LemonNet Examples");
 Console.WriteLine("=================\n");
 
-Console.WriteLine("\n===========================================\n");
-
 Console.WriteLine("=== Maximum Flow Calculation Example ===");
 
 // Create a simple diamond-shaped graph:

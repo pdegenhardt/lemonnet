@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22 d17.14
+VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LemonNet.Example", "examples\LemonNet.Example\LemonNet.Example.csproj", "{B6F41E9A-CC09-576F-CB3D-0A0ACB03338B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LemonNet.Benchmark", "examples\LemonNet.Benchmark\LemonNet.Benchmark.csproj", "{A5B8E7D2-4D09-4E5F-8C9A-1F3B2C4D5E6F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LemonNet.Example.NuGet", "examples\LemonNet.Example.NuGet\LemonNet.Example.NuGet.csproj", "{DD2CDF30-5C10-4C4E-8610-9330A02C5153}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A5B8E7D2-4D09-4E5F-8C9A-1F3B2C4D5E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5B8E7D2-4D09-4E5F-8C9A-1F3B2C4D5E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5B8E7D2-4D09-4E5F-8C9A-1F3B2C4D5E6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD2CDF30-5C10-4C4E-8610-9330A02C5153}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD2CDF30-5C10-4C4E-8610-9330A02C5153}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD2CDF30-5C10-4C4E-8610-9330A02C5153}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD2CDF30-5C10-4C4E-8610-9330A02C5153}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

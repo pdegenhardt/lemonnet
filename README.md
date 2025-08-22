@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/v/LemonNet.svg)](https://www.nuget.org/packages/LemonNet/)
 [![Build Status](https://github.com/pdegenhardt/lemonnet/actions/workflows/publish-nuget.yml/badge.svg)](https://github.com/pdegenhardt/lemonnet/actions)
 
-A high-performance C# wrapper for the LEMON (Library for Efficient Modeling and Optimization in Networks) graph library, providing access to state-of-the-art maximum flow algorithms.
+A high-performance C# wrapper for the LEMON (Library for Efficient Modeling and Optimization in Networks) graph library, providing access to state-of-the-art graph algorithms for maximum flow and shortest path problems.
 
 ## Installation
 
@@ -20,15 +20,24 @@ dotnet add package LemonNet
 
 ## Features
 
-- **Multiple Maximum Flow Algorithms**:
-  - **Edmonds-Karp**: Classic BFS-based algorithm (O(VE²))
-  - **Preflow**: Push-relabel algorithm, generally faster (O(V²√E))
+### Maximum Flow Algorithms
+- **Edmonds-Karp**: Classic BFS-based algorithm (O(VE²))
+- **Preflow**: Push-relabel algorithm, generally faster (O(V²√E))
+
+### Shortest Path Algorithms
+- **Dijkstra**: Single-source shortest path for non-negative weights (O((V+E)logV))
+- **Bellman-Ford**: Handles negative weights and detects negative cycles (O(VE))
+
+### Core Features
 - **Full Parallel Arc Support**: Handle multiple edges between the same nodes
-- **Type-Safe API**: Strongly-typed Node and Arc structures
+- **Type-Safe API**: Strongly-typed Node, Arc, and Path structures
 - **High Performance**: Native C++ performance with minimal marshaling overhead
 - **Memory Efficient**: Uses value types and unsafe spans for zero-copy operations
+- **Flexible Arc Maps**: Support for both integer and floating-point edge weights
 
 ## Quick Start
+
+### Maximum Flow Example
 
 ```csharp
 using LemonNet;
@@ -42,12 +51,11 @@ var v1 = graph.AddNode();
 var v2 = graph.AddNode();
 var sink = graph.AddNode();
 
-// Add arcs
+// Add arcs with capacities
 var arc01 = graph.AddArc(source, v1);
 var arc02 = graph.AddArc(source, v2);
 var arc13 = graph.AddArc(v1, sink);
 var arc23 = graph.AddArc(v2, sink);
-var arc12 = graph.AddArc(v1, v2);
 
 // Solve with Edmonds-Karp
 using var edmondsKarp = new EdmondsKarp(graph);
@@ -55,21 +63,49 @@ edmondsKarp.SetCapacity(arc01, 16);
 edmondsKarp.SetCapacity(arc02, 13);
 edmondsKarp.SetCapacity(arc13, 12);
 edmondsKarp.SetCapacity(arc23, 20);
-edmondsKarp.SetCapacity(arc12, 10);
 
-var result1 = edmondsKarp.Run(source, sink);
-Console.WriteLine($"Max flow (Edmonds-Karp): {result1.MaxFlowValue}");
+var result = edmondsKarp.Run(source, sink);
+Console.WriteLine($"Max flow: {result.MaxFlowValue}");
+```
 
-// Solve with Preflow (generally faster)
-using var preflow = new Preflow(graph);
-preflow.SetCapacity(arc01, 16);
-preflow.SetCapacity(arc02, 13);
-preflow.SetCapacity(arc13, 12);
-preflow.SetCapacity(arc23, 20);
-preflow.SetCapacity(arc12, 10);
+### Shortest Path Example
 
-var result2 = preflow.Run(source, sink);
-Console.WriteLine($"Max flow (Preflow): {result2.MaxFlowValue}");
+```csharp
+using LemonNet;
+
+// Create a directed graph
+using var graph = new LemonDigraph();
+
+// Add nodes
+var nodeA = graph.AddNode();
+var nodeB = graph.AddNode();
+var nodeC = graph.AddNode();
+var nodeD = graph.AddNode();
+
+// Add arcs with distances
+var arcAB = graph.AddArc(nodeA, nodeB);
+var arcAC = graph.AddArc(nodeA, nodeC);
+var arcBD = graph.AddArc(nodeB, nodeD);
+var arcCD = graph.AddArc(nodeC, nodeD);
+
+// Set arc lengths
+using var lengthMap = new ArcMapDouble(graph);
+lengthMap[arcAB] = 4.0;
+lengthMap[arcAC] = 2.0;
+lengthMap[arcBD] = 5.0;
+lengthMap[arcCD] = 1.0;
+
+// Find shortest path with Dijkstra
+using var dijkstra = new Dijkstra(graph, lengthMap);
+var result = dijkstra.Run(nodeA, nodeD);
+
+Console.WriteLine($"Shortest distance: {result.Distance}");
+Console.WriteLine($"Path length: {result.Path?.Length ?? 0} arcs");
+
+// For graphs with negative weights, use Bellman-Ford
+using var bellmanFord = new BellmanFord(graph, lengthMap);
+var bfResult = bellmanFord.Run(nodeA, nodeD);
+Console.WriteLine($"Has negative cycle: {bfResult.HasNegativeCycle}");
 ```
 
 ## Building

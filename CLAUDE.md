@@ -144,3 +144,4 @@ namespace lemon {
 - `src/LemonNet.Native/lemon_wrapper.cpp` - Template instantiation and C++ to C bridging
 - `src/LemonNet.Native/lemon-1.3.1/lemon/edmonds_karp.h` - Algorithm being wrapped
 - `src/LemonNet.Native/lemon-1.3.1/lemon/smart_graph.h` - Graph implementation used
+- we are not using the runtimes folder. wrapper binaries are alongside LemonNet.dll
